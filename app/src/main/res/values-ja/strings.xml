@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">学マス スコアヘルパー</string>
+    <string name="start_service_title">サービス開始</string>
+    <string name="start_service_desc">下のボタンをクリックしてヘルパーを起動できます。</string>
+    <string name="app_desc">現在のパラメータに基づいて最小に達する必要がある最小スコアを計算します。 by @WindSekirun</string>
+    <string name="start_service_button">サービスを始める</string>
+    <string name="stop_service">サービスを停止する</string>
+    <string name="close">閉じる</string>
+    <string name="preference_desc">スコアの計算に必要なさまざまな値を設定します。</string>
+    <string name="preference_title">基準設定</string>
+    <string name="reset_to_defaults">初期設定の初期化</string>
+    <string name="confirm">確認</string>
+    <string name="notification_not_enabled">通知設定がオフになっています。設定で通知を有効にしてください。</string>
+    <string name="capturing_progress">分析中…</string>
+    <string name="analyze_fail">分析失敗</string>
+    <string name="confirm_recognition">認識された値を確認してください。</string>
+    <string name="impossible_result">達成不可</string>
+    <string name="already_result">すでに達成</string>
+    <string name="basic_first_score">1位スコア</string>
+    <string name="parameter_multiplier">パラメータ倍率</string>
+</resources>
