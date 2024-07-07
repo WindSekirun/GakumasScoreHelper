@@ -2,6 +2,8 @@
 
 Score Calculator for 「学園アイドルマスター」 (学マス), 「학원 아이돌마스터」 (학원마스)
 
+![Downloads](https://img.shields.io/github/downloads/WindSekirun/GakumasScoreHelper/latest/total)
+
 ## JP
 
 「学園アイドルマスター」のための最終プロデュース 評価スコア計算機

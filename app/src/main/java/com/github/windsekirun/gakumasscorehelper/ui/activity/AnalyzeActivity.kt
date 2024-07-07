@@ -27,6 +27,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.github.windsekirun.gakumasscorehelper.R
@@ -236,6 +237,20 @@ fun OverlayContent(onClose: () -> Unit, body: @Composable () -> Unit) {
             }
         }
     }
+}
+
+@Preview(locale = "ko")
+@Preview(locale = "en")
+@Preview(locale = "ja")
+@Composable
+fun ConfirmOverlayPreview() {
+    ConfirmOverlay(predictionResult = PredictionResult("641 1500 1221", 641, 1550, 1221), onClose = { _, _, _ -> })
+}
+
+@Preview
+@Composable
+fun ScoreOverlayPreview() {
+    ScoreOverlay(scores = mapOf("S" to "35950", "A+" to "8793"), onClose = { })
 }
 
 data class PredictionResult(val text: String, val vo: Int, val da: Int, val vi: Int)
