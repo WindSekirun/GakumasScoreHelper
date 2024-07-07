@@ -1,0 +1,21 @@
+<resources>
+    <string name="app_name">GakumasScoreHelper</string>
+    <string name="start_service_title">Start Service</string>
+    <string name="start_service_desc">You can start helper by clicking the button below.</string>
+    <string name="app_desc">Calculates the minimum score that must be reached based on the current parameters. by @WindSekirun</string>
+    <string name="start_service_button">Start Service</string>
+    <string name="stop_service">Stop Service</string>
+    <string name="close">Close</string>
+    <string name="preference_desc">Set various values needed to calculate scores.</string>
+    <string name="preference_title">Preferences</string>
+    <string name="reset_to_defaults">Reset to Defaults</string>
+    <string name="confirm">Confirm</string>
+    <string name="notification_not_enabled">Notification settings are turned off. Please enable notifications in settings.</string>
+    <string name="capturing_progress">Capturing in progress…</string>
+    <string name="analyze_fail">Analyze Fail</string>
+    <string name="confirm_recognition">Please check the recognized value.</string>
+    <string name="impossible_result">Impossible</string>
+    <string name="already_result">Already</string>
+    <string name="basic_first_score">1st score</string>
+    <string name="parameter_multiplier">Parameter scale</string>
+</resources>
