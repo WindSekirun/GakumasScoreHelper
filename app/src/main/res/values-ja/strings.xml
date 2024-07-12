@@ -14,7 +14,7 @@
     <string name="notification_not_enabled">通知設定がオフになっています。設定で通知を有効にしてください。</string>
     <string name="capturing_progress">分析中…</string>
     <string name="analyze_fail">分析失敗</string>
-    <string name="confirm_recognition">認識された値を確認してください。</string>
+    <string name="confirm_recognition">認識した数字を確認</string>
     <string name="impossible_result">達成不可</string>
     <string name="already_result">すでに達成</string>
     <string name="basic_first_score">1位スコア</string>

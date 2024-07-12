@@ -125,10 +125,10 @@ class CaptureService : Service() {
         val width = bitmap.width
         val height = bitmap.height
 
-        val left = (width * 0.2).toInt()
-        val top = (height * 0.5).toInt()
-        val right = (width * 0.8).toInt()
-        val bottom = (height * 0.7).toInt()
+        val left = (width * 0.16).toInt()
+        val top = (height * 0.7).toInt()
+        val right = (width * 0.32).toInt()
+        val bottom = (height * 0.83).toInt()
 
         val cropWidth = right - left
         val cropHeight = bottom - top

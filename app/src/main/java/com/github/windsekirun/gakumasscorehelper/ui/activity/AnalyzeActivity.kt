@@ -36,6 +36,7 @@ import com.github.windsekirun.gakumasscorehelper.ui.component.TextFieldTableItem
 import com.github.windsekirun.gakumasscorehelper.ui.theme.GakumasScoreHelperTheme
 import com.github.windsekirun.gakumasscorehelper.viewmodel.DataViewModel
 import com.google.mlkit.vision.common.InputImage
+import com.google.mlkit.vision.text.Text
 import com.google.mlkit.vision.text.TextRecognition
 import com.google.mlkit.vision.text.latin.TextRecognizerOptions
 import dagger.hilt.android.AndroidEntryPoint
@@ -96,21 +97,22 @@ class AnalyzeActivity : ComponentActivity() {
     }
 
     private suspend fun extractScoresFromBitmap(image: InputImage): PredictionResult {
+        fun List<Text.TextBlock>.getIndex(index: Int): Int {
+            return this.getOrNull(index)?.text?.toIntOrNull() ?: 0
+        }
+
         return suspendCoroutine { cont ->
             recognizer.process(image)
                 .addOnSuccessListener { result ->
                     if (result.textBlocks.isNotEmpty()) {
-                        val text = result.textBlocks[0].text
-                        val list = text.map { if (!it.isDigit()) Char(32) else it }.joinToString("")
-                            .split(" ")
-                            .map { it.toIntOrNull() ?: 0 }
-
+                        val blocks = result.textBlocks
                         cont.resume(
                             PredictionResult(
-                                text,
-                                list.getOrElse(0) { 0 },
-                                list.getOrElse(1) { 0 },
-                                list.getOrElse(2) { 0 })
+                                result.text.replace("\n", "\\n"),
+                                blocks.getIndex(0),
+                                blocks.getIndex(1),
+                                blocks.getIndex(2)
+                            )
                         )
                     } else {
                         cont.resume(PredictionResult("", 0, 0, 0))
@@ -228,7 +230,7 @@ fun OverlayContent(onClose: () -> Unit, body: @Composable () -> Unit) {
                 .padding(16.dp)
                 .background(Color(0x80000000), shape = RoundedCornerShape(8.dp))
                 .padding(16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
+            horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             body()
             Spacer(modifier = Modifier.height(16.dp))
