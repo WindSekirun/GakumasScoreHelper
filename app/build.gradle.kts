@@ -14,8 +14,8 @@ android {
         applicationId = "com.github.windsekirun.gakumasscorehelper"
         minSdk = 28
         targetSdk = 34
-        versionCode = 1
-        versionName = "1.1"
+        versionCode = 3
+        versionName = "1.1.1"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {

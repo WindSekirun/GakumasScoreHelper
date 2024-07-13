@@ -159,9 +159,9 @@ class AnalyzeActivity : ComponentActivity() {
         grade: String,
         score: Int
     ): AnalyzeType {
-        // 1.1 : 最終試験1位パラメータ20点追加
+        // 1.1.1 : 最終試験1位パラメータ30点追加
         val parameterValue =
-            preference.basicScore + floor((vo + 20 + da + 20 + vi + 20) * preference.parameterMultiplier).toInt()
+            preference.basicScore + floor((vo + 30 + da + 30 + vi + 30) * preference.parameterMultiplier).toInt()
         val targetScore = score - parameterValue
 
         var requiredScore = 0
