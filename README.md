@@ -4,7 +4,7 @@ Score Calculator for 「学園アイドルマスター」 (学マス), 「학원
 
 ![Downloads](https://img.shields.io/github/downloads/WindSekirun/GakumasScoreHelper/latest/total)
 
-![](overlay-result.gif | width=300)
+![](overlay-result.gif|width=300)
 
 ## JP
 
