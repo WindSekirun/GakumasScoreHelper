@@ -46,7 +46,8 @@
         <service
             android:name=".service.CaptureTriggerService"
             android:exported="false"
-            android:foregroundServiceType="specialUse">
+            android:foregroundServiceType="specialUse"
+            android:permission="android.permission.SYSTEM_ALERT_WINDOW">
             <property
                 android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE"
                 android:value="To provide a shortcut capture function on the game screen" />

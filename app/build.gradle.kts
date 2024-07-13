@@ -48,6 +48,19 @@ android {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
         }
     }
+
+    applicationVariants.all {
+        val variant = this
+        if (variant.buildType.name == "release") {
+            variant.outputs.all {
+                val output = this
+                val versionName = variant.versionName
+                val newFileName = "gakumas-score-helper-$versionName-release.apk"
+                output as com.android.build.gradle.internal.api.BaseVariantOutputImpl
+                output.outputFileName = newFileName
+            }
+        }
+    }
 }
 
 dependencies {

@@ -20,6 +20,8 @@ class CaptureTriggerActivity : ComponentActivity() {
                     startForegroundService(serviceIntent)
                     finish()
                 }
+            } else {
+                finish()
             }
         }
 

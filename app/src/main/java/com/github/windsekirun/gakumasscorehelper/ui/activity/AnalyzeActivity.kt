@@ -1,5 +1,6 @@
 package com.github.windsekirun.gakumasscorehelper.ui.activity
 
+import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
@@ -10,6 +11,7 @@ import androidx.activity.viewModels
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -27,6 +29,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -54,7 +62,7 @@ class AnalyzeActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val screenshotPath = intent.getStringExtra("screenshotPath")
+        val screenshotPath = intent.getStringExtra(SCREENSHOT_PATH)
         val image = screenshotPath?.let {
             InputImage.fromFilePath(this, Uri.fromFile(File(it)))
         }
@@ -63,7 +71,7 @@ class AnalyzeActivity : ComponentActivity() {
             GakumasScoreHelperTheme {
                 val dataPreference by viewModel.dataPreferencesFlow.collectAsState(initial = DataPreference())
                 var predictionResult by remember { mutableStateOf<PredictionResult?>(null) }
-                var calculatedScores by remember { mutableStateOf<Map<String, String>>(emptyMap()) }
+                var calculatedScores by remember { mutableStateOf<List<AnalyzeType>>(emptyList()) }
                 if (image == null) {
                     Text(stringResource(R.string.analyze_fail))
                     return@GakumasScoreHelperTheme
@@ -90,6 +98,11 @@ class AnalyzeActivity : ComponentActivity() {
                                     "A" to dataPreference.criteriaA
                                 )
                             )
+                        },
+                        onRetry = {
+                            val intent = Intent(this@AnalyzeActivity, CaptureTriggerActivity::class.java)
+                            startActivity(intent)
+                            finishAffinity()
                         })
                 }
             }
@@ -131,15 +144,24 @@ class AnalyzeActivity : ComponentActivity() {
         preference: DataPreference,
         extractedScores: List<Int>,
         targetScores: Map<String, Int>
-    ): Map<String, String> {
+    ): List<AnalyzeType> {
         val (vo, da, vi) = extractedScores
-        return targetScores.mapValues { (_, targetScore) ->
-            calculateMinScoreToReach(preference, vo, da, vi, targetScore)
+        return targetScores.entries.map { (grade, targetScore) ->
+            calculateMinScoreToReach(preference, vo, da, vi, grade, targetScore)
         }
     }
 
-    private fun calculateMinScoreToReach(preference: DataPreference, vo: Int, da: Int, vi: Int, score: Int): String {
-        val parameterValue = preference.basicScore + floor((vo + da + vi) * preference.parameterMultiplier).toInt()
+    private fun calculateMinScoreToReach(
+        preference: DataPreference,
+        vo: Int,
+        da: Int,
+        vi: Int,
+        grade: String,
+        score: Int
+    ): AnalyzeType {
+        // 1.1 : 最終試験1位パラメータ20点追加
+        val parameterValue =
+            preference.basicScore + floor((vo + 20 + da + 20 + vi + 20) * preference.parameterMultiplier).toInt()
         val targetScore = score - parameterValue
 
         var requiredScore = 0
@@ -163,11 +185,15 @@ class AnalyzeActivity : ComponentActivity() {
         }
 
         return when {
-            accumulatedScore < targetScore -> getString(R.string.impossible_result)
-            requiredScore == 0 -> getString(R.string.already_result)
-            requiredScore < 7000 -> getString(R.string.already_result)
-            else -> requiredScore.toString()
+            accumulatedScore < targetScore -> AnalyzeType.Impossible(grade)
+            requiredScore == 0 -> AnalyzeType.Already(grade)
+            requiredScore < 7000 -> AnalyzeType.Already(grade)
+            else -> AnalyzeType.Value(grade, requiredScore)
         }
+    }
+
+    companion object {
+        private const val SCREENSHOT_PATH = "screenshotPath"
     }
 }
 
@@ -175,18 +201,26 @@ class AnalyzeActivity : ComponentActivity() {
 fun ConfirmOverlay(
     predictionResult: PredictionResult,
     onClose: (vo: Int, da: Int, vi: Int) -> Unit,
+    onRetry: () -> Unit
 ) {
     var editedVo by remember { mutableStateOf(predictionResult.vo.toString()) }
     var editedDa by remember { mutableStateOf(predictionResult.da.toString()) }
     var editedVi by remember { mutableStateOf(predictionResult.vi.toString()) }
 
-    OverlayContent(onClose = {
-        onClose(
-            editedVo.toIntOrNull() ?: 0,
-            editedDa.toIntOrNull() ?: 0,
-            editedVi.toIntOrNull() ?: 0
-        )
-    }) {
+    OverlayContent(
+        onClose = {
+            onClose(
+                editedVo.toIntOrNull() ?: 0,
+                editedDa.toIntOrNull() ?: 0,
+                editedVi.toIntOrNull() ?: 0
+            )
+        },
+        button = {
+            Button(onClick = onRetry, modifier = Modifier.padding(end = 8.dp)) {
+                Text(stringResource(R.string.retry))
+            }
+        }
+    ) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             Text(text = stringResource(R.string.confirm_recognition), fontSize = 18.sp, color = Color.White)
             Text(text = "Result: ${predictionResult.text}", fontSize = 12.sp, color = Color.White)
@@ -208,21 +242,41 @@ fun ConfirmOverlay(
                 labelColor = Color.White,
                 onValueChange = { _, value -> editedVi = value }
             )
+
         }
     }
 }
 
 @Composable
-fun ScoreOverlay(scores: Map<String, String>, onClose: () -> Unit) {
+fun ScoreOverlay(scores: List<AnalyzeType>, onClose: () -> Unit) {
     OverlayContent(onClose = onClose) {
-        scores.forEach { (grade, score) ->
-            Text(text = "$grade = $score", fontSize = 18.sp, color = Color.White)
-        }
+        scores
+            .filter { it !is AnalyzeType.Already }
+            .forEach {
+                if (it is AnalyzeType.Value) {
+                    Row {
+                        val builder = buildAnnotatedString {
+                            append(it.grade)
+                            append(" : ")
+                            withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
+                                append(it.score.toString())
+                            }
+                        }
+                        Text(text = builder, fontSize = 18.sp, color = Color.White)
+                    }
+                } else if (it is AnalyzeType.Impossible) {
+                    Text(
+                        text = stringResource(R.string.impossible_result, it.grade),
+                        style = TextStyle(textDecoration = TextDecoration.LineThrough),
+                        color = Color.Gray
+                    )
+                }
+            }
     }
 }
 
 @Composable
-fun OverlayContent(onClose: () -> Unit, body: @Composable () -> Unit) {
+fun OverlayContent(onClose: () -> Unit, button: @Composable () -> Unit = {}, body: @Composable () -> Unit) {
     Box {
         Column(
             modifier = Modifier
@@ -234,8 +288,11 @@ fun OverlayContent(onClose: () -> Unit, body: @Composable () -> Unit) {
         ) {
             body()
             Spacer(modifier = Modifier.height(16.dp))
-            Button(onClick = onClose) {
-                Text(stringResource(R.string.close))
+            Row {
+                button()
+                Button(onClick = onClose) {
+                    Text(stringResource(R.string.confirm))
+                }
             }
         }
     }
@@ -246,13 +303,42 @@ fun OverlayContent(onClose: () -> Unit, body: @Composable () -> Unit) {
 @Preview(locale = "ja")
 @Composable
 fun ConfirmOverlayPreview() {
-    ConfirmOverlay(predictionResult = PredictionResult("641 1500 1221", 641, 1550, 1221), onClose = { _, _, _ -> })
+    ConfirmOverlay(
+        predictionResult = PredictionResult("641 1500 1221", 641, 1550, 1221),
+        onClose = { _, _, _ -> },
+        onRetry = {})
 }
 
-@Preview
+@Preview(locale = "ko")
+@Preview(locale = "en")
+@Preview(locale = "ja")
 @Composable
 fun ScoreOverlayPreview() {
-    ScoreOverlay(scores = mapOf("S" to "35950", "A+" to "8793"), onClose = { })
+    val list = listOf(
+        AnalyzeType.Impossible("S"),
+        AnalyzeType.Value("A+", 8793),
+        AnalyzeType.Already("A")
+    )
+    ScoreOverlay(scores = list, onClose = { })
+}
+
+@Preview(locale = "ko")
+@Preview(locale = "en")
+@Preview(locale = "ja")
+@Composable
+fun ScoreOverlayPreview2() {
+    val list = listOf(
+        AnalyzeType.Value("S", 35673),
+        AnalyzeType.Value("A+", 15800),
+        AnalyzeType.Value("A", 9400)
+    )
+    ScoreOverlay(scores = list, onClose = { })
 }
 
 data class PredictionResult(val text: String, val vo: Int, val da: Int, val vi: Int)
+
+sealed class AnalyzeType {
+    data class Impossible(val grade: String) : AnalyzeType()
+    data class Value(val grade: String, val score: Int) : AnalyzeType()
+    data class Already(val grade: String) : AnalyzeType()
+}

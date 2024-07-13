@@ -9,6 +9,8 @@ import android.provider.Settings
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -17,15 +19,22 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material3.Button
+import androidx.compose.material3.Checkbox
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.core.content.getSystemService
 import com.github.windsekirun.gakumasscorehelper.Constants
 import com.github.windsekirun.gakumasscorehelper.R
@@ -49,33 +58,37 @@ class SettingsActivity : ComponentActivity() {
                 SettingsTop(
                     dataPreference,
                     resetToDefaults = { viewModel.resetToDefaults() },
-                    clickStartService = { startForegroundService() },
+                    clickStartService = { startForegroundService(it) },
                     clickStopService = {
                         stopForegroundService()
                     },
+                    onOverlayChange = { value -> viewModel.updateValues(Constants.PREFERENCE_KEY_OVERLAY_USE, value) },
                     updateValues = { key, value -> viewModel.updateValues(key, value) })
             }
         }
     }
 
-    private fun startForegroundService() {
+    private fun startForegroundService(useOverlayChecked: Boolean) {
         val notificationManager = getSystemService<NotificationManager>()
         if (notificationManager?.areNotificationsEnabled() != true) {
-            AlertDialog.Builder(this)
-                .setTitle(R.string.app_name)
-                .setMessage(getString(R.string.notification_not_enabled))
-                .setPositiveButton(R.string.confirm) { dialog, _ ->
-                    dialog.dismiss()
-                    val intent = Intent().apply {
-                        action = Settings.ACTION_APP_NOTIFICATION_SETTINGS
-                        putExtra(Settings.EXTRA_APP_PACKAGE, packageName)
-                    }
-                    startActivity(intent)
+            showAlertDialog(getString(R.string.notification_not_enabled)) {
+                val intent = Intent().apply {
+                    action = Settings.ACTION_APP_NOTIFICATION_SETTINGS
+                    putExtra(Settings.EXTRA_APP_PACKAGE, packageName)
                 }
-                .setNegativeButton(R.string.close) { dialog, _ ->
-                    dialog.dismiss()
+                startActivity(intent)
+            }
+            return
+        }
+
+        if (useOverlayChecked && !Settings.canDrawOverlays(this)) {
+            showAlertDialog(getString(R.string.overlay_not_enabled)) {
+                val intent = Intent().apply {
+                    action = Settings.ACTION_MANAGE_OVERLAY_PERMISSION
+                    putExtra(Settings.EXTRA_APP_PACKAGE, packageName)
                 }
-                .show()
+                startActivity(intent)
+            }
             return
         }
 
@@ -89,15 +102,35 @@ class SettingsActivity : ComponentActivity() {
         stopService(intent)
         finishAffinity()
     }
+
+    private fun showAlertDialog(message: String, positive: () -> Unit) {
+        AlertDialog.Builder(this)
+            .setTitle(R.string.app_name)
+            .setMessage(message)
+            .setPositiveButton(R.string.confirm) { dialog, _ ->
+                dialog.dismiss()
+                positive()
+                val intent = Intent().apply {
+                    action = Settings.ACTION_APP_NOTIFICATION_SETTINGS
+                    putExtra(Settings.EXTRA_APP_PACKAGE, packageName)
+                }
+                startActivity(intent)
+            }
+            .setNegativeButton(R.string.close) { dialog, _ ->
+                dialog.dismiss()
+            }
+            .show()
+    }
 }
 
 @Composable
 fun SettingsTop(
     preference: DataPreference,
-    clickStartService: () -> Unit,
+    clickStartService: (useOverlayChecked: Boolean) -> Unit,
     clickStopService: () -> Unit,
     resetToDefaults: () -> Unit,
     updateValues: (key: String, value: Any) -> Unit,
+    onOverlayChange: (checked: Boolean) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val keyList = listOf(
@@ -125,6 +158,8 @@ fun SettingsTop(
         "30000 ~ 40000 →" to preference.examScoreMultiplier_30000_40000.toString(),
     )
 
+    var useOverlayChecked by remember { mutableStateOf(true) }
+
     Surface(
         modifier = modifier.fillMaxSize()
     ) {
@@ -137,15 +172,35 @@ fun SettingsTop(
                 )
             }
             item(key = "start-service") {
-                TitleAndDesc(
-                    title = stringResource(id = R.string.start_service_title),
-                    desc = stringResource(id = R.string.start_service_desc),
-                    modifier = Modifier.padding(top = 32.dp)
-                )
+                Column {
+                    TitleAndDesc(
+                        title = stringResource(id = R.string.start_service_title),
+                        desc = stringResource(id = R.string.start_service_desc),
+                        modifier = Modifier.padding(top = 32.dp)
+                    )
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Checkbox(
+                            checked = useOverlayChecked,
+                            onCheckedChange = {
+                                useOverlayChecked = it
+                                onOverlayChange(it)
+                            }
+                        )
+                        Text(
+                            stringResource(R.string.use_overlay_button)
+                        )
+                    }
+                    Text(
+                        stringResource(R.string.use_overlay_desc),
+                        fontSize = 12.sp,
+                        color = Color.Gray,
+                        modifier = Modifier.padding(horizontal = 16.dp)
+                    )
+                }
             }
             item(key = "start-service-button") {
                 Button(
-                    onClick = clickStartService,
+                    onClick = { clickStartService(useOverlayChecked) },
                     modifier = Modifier
                         .padding(top = 10.dp)
                         .fillMaxWidth()
@@ -212,6 +267,7 @@ private fun SettingsPreview() {
             resetToDefaults = {},
             clickStartService = {},
             clickStopService = {},
+            onOverlayChange = {},
             updateValues = { _, _ -> })
     }
 }

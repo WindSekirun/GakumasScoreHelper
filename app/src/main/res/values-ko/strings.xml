@@ -3,7 +3,7 @@
     <string name="app_name">학원마스 점수 도우미</string>
     <string name="start_service_title">서비스 시작</string>
     <string name="start_service_desc">아래 버튼을 클릭하여 도우미를 시작할 수 있습니다.</string>
-    <string name="app_desc">현재 파라미터를 기반으로 최소로 도달해야 하는 최소점수를 계산합니다. by @WindSekirun</string>
+    <string name="app_desc">현재 파라미터를 기반으로 최소로 도달해야 하는 최종시험 점수를 계산합니다. by @WindSekirun</string>
     <string name="start_service_button">서비스 시작하기</string>
     <string name="stop_service">서비스 중지하기</string>
     <string name="close">닫기</string>
@@ -14,9 +14,12 @@
     <string name="notification_not_enabled">알림 설정이 꺼져있습니다. 설정에서 알림을 활성화 해주세요.</string>
     <string name="capturing_progress">분석 진행중…</string>
     <string name="analyze_fail">분석 실패</string>
-    <string name="confirm_recognition">인식된 값을 확인해주세요.</string>
-    <string name="impossible_result">달성 불가</string>
-    <string name="already_result">이미 달성</string>
+    <string name="confirm_recognition">인식된 파라미터 확인</string>
+    <string name="impossible_result">%s - 달성 불가</string>
     <string name="basic_first_score">1위 점수</string>
     <string name="parameter_multiplier">파라미터 배율</string>
+    <string name="overlay_not_enabled">오버레이 권한이 허용되지 않았습니다. 설정에서 허용해주세요.</string>
+    <string name="use_overlay_button">오버레이 버튼 사용</string>
+    <string name="use_overlay_desc">화면 위에 버튼을 클릭하여 분석을 실행할 수 있습니다.\n버튼을 드래그하여 버튼을 이동할 수 있습니다.</string>
+    <string name="retry">다시 시도</string>
 </resources>

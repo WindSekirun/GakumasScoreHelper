@@ -12,4 +12,7 @@ object Constants {
     const val PREFERENCE_KEY_CRITERIA_A = "criteria_a"
     const val PREFERENCE_KEY_CRITERIA_A_PLUS = "criteria_a_plus"
     const val PREFERENCE_KEY_CRITERIA_S = "criteria_s"
+    const val PREFERENCE_KEY_OVERLAY_USE = "overlayUse"
+    const val PREFERENCE_KEY_OVERLAY_X = "overlayXPosition"
+    const val PREFERENCE_KEY_OVERLAY_Y = "overlayYPosition"
 }

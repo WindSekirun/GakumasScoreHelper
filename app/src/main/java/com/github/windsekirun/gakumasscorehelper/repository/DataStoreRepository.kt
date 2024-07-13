@@ -1,6 +1,7 @@
 package com.github.windsekirun.gakumasscorehelper.repository
 
 import android.content.Context
+import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.doublePreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.intPreferencesKey
@@ -29,6 +30,9 @@ class DataStoreRepository(private val context: Context) {
         val CRITERIA_A = intPreferencesKey(Constants.PREFERENCE_KEY_CRITERIA_A)
         val CRITERIA_A_PLUS = intPreferencesKey(Constants.PREFERENCE_KEY_CRITERIA_A_PLUS)
         val CRITERIA_S = intPreferencesKey(Constants.PREFERENCE_KEY_CRITERIA_S)
+        val USE_OVERLAY = booleanPreferencesKey(Constants.PREFERENCE_KEY_OVERLAY_USE)
+        val OVERLAY_X = intPreferencesKey(Constants.PREFERENCE_KEY_OVERLAY_X)
+        val OVERLAY_Y = intPreferencesKey(Constants.PREFERENCE_KEY_OVERLAY_Y)
     }
 
     val dataPreferencesFlow: Flow<DataPreference> = context.dataStore.data
@@ -71,6 +75,7 @@ class DataStoreRepository(private val context: Context) {
             when (value) {
                 is Int -> preferences[intPreferencesKey(key)] = value
                 is Double -> preferences[doublePreferencesKey(key)] = value
+                is Boolean -> preferences[booleanPreferencesKey(key)] = value
             }
         }
     }
