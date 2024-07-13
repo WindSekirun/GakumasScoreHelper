@@ -113,14 +113,22 @@ class CaptureTriggerService : Service(), CoroutineScope {
     }
 
     private fun createNotification(): Notification {
-        val notificationIntent = Intent(this, CaptureTriggerActivity::class.java)
-        val pendingIntent = PendingIntent.getActivity(this, 0, notificationIntent, PendingIntent.FLAG_IMMUTABLE)
+        val triggerIntent = Intent(this, CaptureTriggerActivity::class.java).run {
+            PendingIntent.getActivity(this@CaptureTriggerService, 0, this, PendingIntent.FLAG_IMMUTABLE)
+        }
+
+        val stopIntent = Intent(this, CaptureTriggerActivity::class.java).apply {
+            action = Constants.INTENT_ACTION_STOP
+        }.run {
+            PendingIntent.getActivity(this@CaptureTriggerService, 1, this, PendingIntent.FLAG_IMMUTABLE)
+        }
 
         return NotificationCompat.Builder(this, Constants.CHANNEL_ID)
             .setContentTitle(getString(R.string.app_name))
             .setContentText(getString(R.string.app_desc))
             .setSmallIcon(R.drawable.notification_icon)
-            .setContentIntent(pendingIntent)
+            .setContentIntent(triggerIntent)
+            .addAction(R.drawable.hatsuboshi_icon, getString(R.string.stop_service), stopIntent)
             .build()
     }
 
@@ -174,6 +182,7 @@ class CaptureTriggerService : Service(), CoroutineScope {
                         windowManager.updateViewLayout(view, params)
                         true
                     }
+
                     MotionEvent.ACTION_UP -> {
                         if (isClick) {
                             val intent = Intent(this@CaptureTriggerService, CaptureTriggerActivity::class.java).apply {

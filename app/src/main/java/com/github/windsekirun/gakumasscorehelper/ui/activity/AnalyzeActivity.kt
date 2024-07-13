@@ -53,6 +53,7 @@ import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 import kotlin.coroutines.suspendCoroutine
 import kotlin.math.floor
+import kotlin.math.max
 
 @AndroidEntryPoint
 class AnalyzeActivity : ComponentActivity() {
@@ -160,8 +161,10 @@ class AnalyzeActivity : ComponentActivity() {
         score: Int
     ): AnalyzeType {
         // 1.1.1 : 最終試験1位パラメータ30点追加
+        fun Int.plusAdditionalParameter() = max(this + 30, 1500)
+
         val parameterValue =
-            preference.basicScore + floor((vo + 30 + da + 30 + vi + 30) * preference.parameterMultiplier).toInt()
+            preference.basicScore + floor((vo.plusAdditionalParameter() + da.plusAdditionalParameter() + vi.plusAdditionalParameter()) * preference.parameterMultiplier).toInt()
         val targetScore = score - parameterValue
 
         var requiredScore = 0

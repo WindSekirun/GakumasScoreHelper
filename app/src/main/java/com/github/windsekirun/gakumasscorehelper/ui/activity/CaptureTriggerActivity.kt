@@ -6,7 +6,9 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.getSystemService
+import com.github.windsekirun.gakumasscorehelper.Constants.INTENT_ACTION_STOP
 import com.github.windsekirun.gakumasscorehelper.service.CaptureService
+import com.github.windsekirun.gakumasscorehelper.service.CaptureTriggerService
 
 class CaptureTriggerActivity : ComponentActivity() {
 
@@ -27,6 +29,13 @@ class CaptureTriggerActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        if (intent.action == INTENT_ACTION_STOP) {
+            val intent = Intent(this, CaptureTriggerService::class.java)
+            stopService(intent)
+            finishAffinity()
+            return
+        }
 
         val mediaProjectionManager = getSystemService<MediaProjectionManager>()!!
         val mediaProjectionIntent = mediaProjectionManager.createScreenCaptureIntent()

@@ -15,4 +15,6 @@ object Constants {
     const val PREFERENCE_KEY_OVERLAY_USE = "overlayUse"
     const val PREFERENCE_KEY_OVERLAY_X = "overlayXPosition"
     const val PREFERENCE_KEY_OVERLAY_Y = "overlayYPosition"
+
+    const val INTENT_ACTION_STOP = "stopService"
 }
