@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">学マス スコアヘルパー</string>
+    <string name="app_name_version">学マス スコアヘルパー v%s</string>
     <string name="start_service_title">サービス開始</string>
     <string name="start_service_desc">下のボタンをクリックしてヘルパーを起動できます。</string>
     <string name="app_desc">現在のパラメータに基づいて最小に達する必要がある最小スコアを計算します。 by @WindSekirun</string>

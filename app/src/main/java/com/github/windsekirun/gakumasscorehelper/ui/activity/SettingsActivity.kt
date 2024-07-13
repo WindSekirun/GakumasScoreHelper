@@ -36,6 +36,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.getSystemService
+import com.github.windsekirun.gakumasscorehelper.BuildConfig
 import com.github.windsekirun.gakumasscorehelper.Constants
 import com.github.windsekirun.gakumasscorehelper.R
 import com.github.windsekirun.gakumasscorehelper.preference.DataPreference
@@ -166,7 +167,7 @@ fun SettingsTop(
         LazyColumn(modifier = Modifier.padding(horizontal = 10.dp)) {
             item(key = "app-title") {
                 TitleAndDesc(
-                    title = stringResource(id = R.string.app_name),
+                    title = stringResource(id = R.string.app_name_version, BuildConfig.VERSION_NAME),
                     desc = stringResource(R.string.app_desc),
                     modifier = Modifier.padding(top = 16.dp)
                 )
