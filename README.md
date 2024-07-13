@@ -1,8 +1,11 @@
 # GakumasScoreHelper
+![Kotlin](https://img.shields.io/badge/kotlin-%237F52FF.svg?style=for-the-badge&logo=kotlin&logoColor=white) ![Android](https://img.shields.io/badge/Android-3DDC84?style=for-the-badge&logo=android&logoColor=white) 
 
 Score Calculator for 「学園アイドルマスター」 (学マス), 「학원 아이돌마스터」 (학원마스)
 
-![Downloads](https://img.shields.io/github/downloads/WindSekirun/GakumasScoreHelper/latest/total)
+Download: [![Downloads](https://img.shields.io/github/downloads/WindSekirun/GakumasScoreHelper/latest/total)](https://github.com/WindSekirun/GakumasScoreHelper/releases/latest)
+
+## Sample
 
 ![](overlay-result.gif)
 
@@ -34,4 +37,4 @@ Score Calculator for 「学園アイドルマスター」 (学マス), 「학원
 
 로 구성되어 있습니다.
 
-만약 벼락치기 레슨 이후 파라미터가 vo 641, da 1500, vi 1221 일 때,  S등급을 위해서는 35950점, A+는 8793점을 노리면 등급을 달성할 수 있습니다.
+만약 벼락치기 레슨 이후 파라미터가 vo 641, da 1500, vi 1221 일 때, S등급을 위해서는 35950점, A+는 8793점을 노리면 등급을 달성할 수 있습니다.
