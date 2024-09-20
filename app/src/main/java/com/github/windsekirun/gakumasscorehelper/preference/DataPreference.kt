@@ -11,5 +11,7 @@ data class DataPreference(
     val examScoreMultiplier_30000_40000: Double = 0.02,
     val criteriaA: Int = 10001,
     val criteriaAPlus: Int = 11501,
-    val criteriaS: Int = 13001
+    val criteriaS: Int = 13001,
+    val criteriaSPlus: Int = 14501,
+    val useMaster: Boolean = false,
 )

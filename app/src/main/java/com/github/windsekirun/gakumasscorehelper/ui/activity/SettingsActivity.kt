@@ -64,6 +64,7 @@ class SettingsActivity : ComponentActivity() {
                         stopForegroundService()
                     },
                     onOverlayChange = { value -> viewModel.updateValues(Constants.PREFERENCE_KEY_OVERLAY_USE, value) },
+                    onMasterChange = { value -> viewModel.updateValues(Constants.PREFERENCE_KEY_MASTER_USE, value) },
                     updateValues = { key, value -> viewModel.updateValues(key, value) })
             }
         }
@@ -132,6 +133,7 @@ fun SettingsTop(
     resetToDefaults: () -> Unit,
     updateValues: (key: String, value: Any) -> Unit,
     onOverlayChange: (checked: Boolean) -> Unit,
+    onMasterChange: (checked: Boolean) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val keyList = listOf(
@@ -150,6 +152,7 @@ fun SettingsTop(
         "A" to preference.criteriaA.toString(),
         "A+" to preference.criteriaAPlus.toString(),
         "S" to preference.criteriaS.toString(),
+        "S+" to preference.criteriaSPlus.toString(),
         stringResource(R.string.basic_first_score) to preference.basicScore.toString(),
         stringResource(R.string.parameter_multiplier) to preference.parameterMultiplier.toString(),
         "0 ~ 5000 →" to preference.examScoreMultiplier_0_5000.toString(),
@@ -236,6 +239,19 @@ fun SettingsTop(
                     Text(stringResource(R.string.reset_to_defaults))
                 }
             }
+            item(key = "use-master") {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Checkbox(
+                        checked = preference.useMaster,
+                        onCheckedChange = {
+                            onMasterChange(it)
+                        }
+                    )
+                    Text(
+                        stringResource(R.string.use_master_button)
+                    )
+                }
+            }
             itemsIndexed(valueList, key = { _, row -> row.first }) { index, row ->
                 TextFieldTableItem(index, row, onValueChange = { i, value ->
                     if (keyList[index].contains("multiplier")) {
@@ -269,6 +285,8 @@ private fun SettingsPreview() {
             clickStartService = {},
             clickStopService = {},
             onOverlayChange = {},
-            updateValues = { _, _ -> })
+            onMasterChange = {},
+            updateValues = { _, _ -> },
+        )
     }
 }

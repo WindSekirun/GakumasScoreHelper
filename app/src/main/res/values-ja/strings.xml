@@ -21,6 +21,8 @@
     <string name="parameter_multiplier">パラメータ倍率</string>
     <string name="overlay_not_enabled">オーバーレイ権限が許可されていません。設定で許可してください。</string>
     <string name="use_overlay_button">オーバーレイボタンを使用</string>
+    <string name="use_master_button">難易度: マスター</string>
     <string name="use_overlay_desc">画面上のボタンをクリックして分析を実行できます。\nボタンをドラッグしてボタンを移動できます。</string>
     <string name="retry">再試行</string>
+    <string name="complete_result">%s - 完了</string>
 </resources>

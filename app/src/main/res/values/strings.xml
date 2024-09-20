@@ -16,10 +16,12 @@
     <string name="analyze_fail">Analyze Fail</string>
     <string name="confirm_recognition">Check recognized parameters</string>
     <string name="impossible_result">%s - Impossible</string>
+    <string name="complete_result">%s - Complete</string>
     <string name="basic_first_score">1st score</string>
     <string name="parameter_multiplier">Parameter scale</string>
     <string name="overlay_not_enabled">Overlay permission not granted. Please allow it in settings.</string>
     <string name="use_overlay_button">Use overlay button</string>
+    <string name="use_master_button">Difficulty: Master</string>
     <string name="use_overlay_desc">You can run the analysis by clicking the button on the screen.\nYou can move the button by dragging it.</string>
     <string name="retry">Retry</string>
 </resources>

@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
+import androidx.compose.material3.Checkbox
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -88,12 +89,15 @@ class AnalyzeActivity : ComponentActivity() {
                     })
                 } else if (predictionResult != null) {
                     ConfirmOverlay(
+                        useMaster = dataPreference.useMaster,
                         predictionResult!!,
-                        onClose = { vo, da, di ->
+                        onClose = { vo, da, di, useMaster ->
                             calculatedScores = calculateScores(
                                 dataPreference,
+                                useMaster,
                                 listOf(vo, da, di),
                                 targetScores = mapOf(
+                                    "S+" to dataPreference.criteriaSPlus,
                                     "S" to dataPreference.criteriaS,
                                     "A+" to dataPreference.criteriaAPlus,
                                     "A" to dataPreference.criteriaA
@@ -112,7 +116,7 @@ class AnalyzeActivity : ComponentActivity() {
 
     private suspend fun extractScoresFromBitmap(image: InputImage): PredictionResult {
         fun List<Text.TextBlock>.getIndex(index: Int): Int {
-            return this.getOrNull(index)?.text?.toIntOrNull() ?: 0
+            return this.getOrNull(index)?.text?.filter { it.isDigit() }?.toIntOrNull() ?: 0
         }
 
         return suspendCoroutine { cont ->
@@ -143,17 +147,19 @@ class AnalyzeActivity : ComponentActivity() {
 
     private fun calculateScores(
         preference: DataPreference,
+        useMaster: Boolean,
         extractedScores: List<Int>,
         targetScores: Map<String, Int>
     ): List<AnalyzeType> {
         val (vo, da, vi) = extractedScores
         return targetScores.entries.map { (grade, targetScore) ->
-            calculateMinScoreToReach(preference, vo, da, vi, grade, targetScore)
+            calculateMinScoreToReach(preference, useMaster, vo, da, vi, grade, targetScore)
         }
     }
 
     private fun calculateMinScoreToReach(
         preference: DataPreference,
+        useMaster: Boolean,
         vo: Int,
         da: Int,
         vi: Int,
@@ -161,7 +167,8 @@ class AnalyzeActivity : ComponentActivity() {
         score: Int
     ): AnalyzeType {
         // 1.1.1 : 最終試験1位パラメータ30点追加
-        fun Int.plusAdditionalParameter() = min(this + 30, 1500)
+        val maxScore = if (useMaster) 1800 else 1500
+        fun Int.plusAdditionalParameter() = min(this + 30, maxScore)
 
         val parameterValue =
             preference.basicScore + floor((vo.plusAdditionalParameter() + da.plusAdditionalParameter() + vi.plusAdditionalParameter()) * preference.parameterMultiplier).toInt()
@@ -202,20 +209,24 @@ class AnalyzeActivity : ComponentActivity() {
 
 @Composable
 fun ConfirmOverlay(
+    useMaster: Boolean,
     predictionResult: PredictionResult,
-    onClose: (vo: Int, da: Int, vi: Int) -> Unit,
+    onClose: (vo: Int, da: Int, vi: Int, useMaster: Boolean) -> Unit,
     onRetry: () -> Unit
 ) {
+
     var editedVo by remember { mutableStateOf(predictionResult.vo.toString()) }
     var editedDa by remember { mutableStateOf(predictionResult.da.toString()) }
     var editedVi by remember { mutableStateOf(predictionResult.vi.toString()) }
+    var useMasterState by remember { mutableStateOf(useMaster) }
 
     OverlayContent(
         onClose = {
             onClose(
                 editedVo.toIntOrNull() ?: 0,
                 editedDa.toIntOrNull() ?: 0,
-                editedVi.toIntOrNull() ?: 0
+                editedVi.toIntOrNull() ?: 0,
+                useMasterState
             )
         },
         button = {
@@ -227,6 +238,15 @@ fun ConfirmOverlay(
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             Text(text = stringResource(R.string.confirm_recognition), fontSize = 18.sp, color = Color.White)
             Text(text = "Result: ${predictionResult.text}", fontSize = 12.sp, color = Color.White)
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Checkbox(
+                    checked = useMasterState,
+                    onCheckedChange = {
+                        useMasterState = it
+                    }
+                )
+                Text(text = stringResource(R.string.use_master_button), fontSize = 12.sp, color = Color.White)
+            }
             TextFieldTableItem(
                 index = 0,
                 row = "Vo" to editedVo,
@@ -253,10 +273,9 @@ fun ConfirmOverlay(
 @Composable
 fun ScoreOverlay(scores: List<AnalyzeType>, onClose: () -> Unit) {
     OverlayContent(onClose = onClose) {
-        scores
-            .filter { it !is AnalyzeType.Already }
-            .forEach {
-                if (it is AnalyzeType.Value) {
+        scores.forEach {
+            when (it) {
+                is AnalyzeType.Value -> {
                     Row {
                         val builder = buildAnnotatedString {
                             append(it.grade)
@@ -267,14 +286,25 @@ fun ScoreOverlay(scores: List<AnalyzeType>, onClose: () -> Unit) {
                         }
                         Text(text = builder, fontSize = 18.sp, color = Color.White)
                     }
-                } else if (it is AnalyzeType.Impossible) {
+                }
+
+                is AnalyzeType.Impossible -> {
                     Text(
                         text = stringResource(R.string.impossible_result, it.grade),
                         style = TextStyle(textDecoration = TextDecoration.LineThrough),
                         color = Color.Gray
                     )
                 }
+
+                is AnalyzeType.Already -> {
+                    Text(
+                        text = stringResource(R.string.complete_result, it.grade),
+                        style = TextStyle(textDecoration = TextDecoration.LineThrough),
+                        color = Color.Gray
+                    )
+                }
             }
+        }
     }
 }
 
@@ -307,8 +337,9 @@ fun OverlayContent(onClose: () -> Unit, button: @Composable () -> Unit = {}, bod
 @Composable
 fun ConfirmOverlayPreview() {
     ConfirmOverlay(
+        useMaster = true,
         predictionResult = PredictionResult("641 1500 1221", 641, 1550, 1221),
-        onClose = { _, _, _ -> },
+        onClose = { _, _, _, _ -> },
         onRetry = {})
 }
 
@@ -318,6 +349,7 @@ fun ConfirmOverlayPreview() {
 @Composable
 fun ScoreOverlayPreview() {
     val list = listOf(
+        AnalyzeType.Impossible("S+"),
         AnalyzeType.Impossible("S"),
         AnalyzeType.Value("A+", 8793),
         AnalyzeType.Already("A")
@@ -331,6 +363,7 @@ fun ScoreOverlayPreview() {
 @Composable
 fun ScoreOverlayPreview2() {
     val list = listOf(
+        AnalyzeType.Value("S+", 49999),
         AnalyzeType.Value("S", 35673),
         AnalyzeType.Value("A+", 15800),
         AnalyzeType.Value("A", 9400)

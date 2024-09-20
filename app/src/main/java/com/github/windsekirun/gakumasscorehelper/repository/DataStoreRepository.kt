@@ -30,7 +30,9 @@ class DataStoreRepository(private val context: Context) {
         val CRITERIA_A = intPreferencesKey(Constants.PREFERENCE_KEY_CRITERIA_A)
         val CRITERIA_A_PLUS = intPreferencesKey(Constants.PREFERENCE_KEY_CRITERIA_A_PLUS)
         val CRITERIA_S = intPreferencesKey(Constants.PREFERENCE_KEY_CRITERIA_S)
+        val CRITERIA_S_PLUS = intPreferencesKey(Constants.PREFERENCE_KEY_CRITERIA_S_PLUS)
         val USE_OVERLAY = booleanPreferencesKey(Constants.PREFERENCE_KEY_OVERLAY_USE)
+        val USE_MASTER = booleanPreferencesKey(Constants.PREFERENCE_KEY_MASTER_USE)
         val OVERLAY_X = intPreferencesKey(Constants.PREFERENCE_KEY_OVERLAY_X)
         val OVERLAY_Y = intPreferencesKey(Constants.PREFERENCE_KEY_OVERLAY_Y)
     }
@@ -50,7 +52,9 @@ class DataStoreRepository(private val context: Context) {
                     ?: 0.02,
                 criteriaA = preferences[PreferencesKeys.CRITERIA_A] ?: 10001,
                 criteriaAPlus = preferences[PreferencesKeys.CRITERIA_A_PLUS] ?: 11501,
-                criteriaS = preferences[PreferencesKeys.CRITERIA_S] ?: 13001
+                criteriaS = preferences[PreferencesKeys.CRITERIA_S] ?: 13001,
+                criteriaSPlus = preferences[PreferencesKeys.CRITERIA_S_PLUS] ?: 14501,
+                useMaster = preferences[PreferencesKeys.USE_MASTER] ?: false,
             )
         }
 
@@ -67,6 +71,8 @@ class DataStoreRepository(private val context: Context) {
             preferences[PreferencesKeys.CRITERIA_A] = updatedData.criteriaA
             preferences[PreferencesKeys.CRITERIA_A_PLUS] = updatedData.criteriaAPlus
             preferences[PreferencesKeys.CRITERIA_S] = updatedData.criteriaS
+            preferences[PreferencesKeys.CRITERIA_S_PLUS] = updatedData.criteriaSPlus
+            preferences[PreferencesKeys.USE_MASTER] = updatedData.useMaster
         }
     }
 
